@@ -1,0 +1,9 @@
+[project] 
+name = "gorgon-system" 
+version = "0.0.1" 
+description = "Experimental modular monitoring library (Gorgon System)" 
+requires-python = ">=3.10" 
+ 
+[build-system] 
+requires = ["setuptools", "wheel"] 
+build-backend = "setuptools.build_meta" 
