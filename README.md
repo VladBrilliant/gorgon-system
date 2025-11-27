@@ -1,13 +1,13 @@
 <p align="center">
-  <!-- Replace this image with your own banner later: docs/gorgon-banner.png -->
-  <img src="docs/gorgon-banner.png" alt="Gorgon System" width="800">
+  <img src="docs/pictures/gorgon_logo_main.png" alt="Gorgon System Logo" width="450">
 </p>
 
 <h1 align="center">Gorgon System</h1>
 
 <p align="center">
-  <em>Biology-inspired modular monitoring for ML, data and DevOps workloads.</em>
+  <em>Biology-inspired modular monitoring framework for ML, Data and DevOps workloads.</em>
 </p>
+
 
 <p align="center">
   <a href="https://www.python.org/">
