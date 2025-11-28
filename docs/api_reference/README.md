@@ -1,0 +1,255 @@
+# API Reference — Gorgon System
+
+This directory contains the **official API reference** for all modules of  
+Gorgon System: Rhopalia Sensors, Crabs, Octopus Hub, Gorgon Bell, and MAI Engine.
+
+The goal of the API reference is to provide **precise, developer-friendly  
+documentation** for every public class, method, and function.
+
+---
+
+# 1. Module Overview
+
+Gorgon System is organized into five primary namespaces:
+
+```
+gorgon.rhopalia     → Atomic sensors (CPU, RAM, future disk/net/SQL/etc.)
+gorgon.crabs        → Monitoring agents that poll sensors
+gorgon.core         → Octopus hub (coordination, buffering, routing)
+gorgon.bell         → UI/analysis layer (CLI, future web/Jupyter)
+gorgon.mai          → Machine-learning assisted inference (future)
+```
+
+Each module follows strict design principles:
+
+- stateless, atomic sensors  
+- modular Crabs with pluggable sensors  
+- hub-centric data coordination  
+- analysis presented through a clean UI layer  
+- optional MAI inference module  
+
+---
+
+# 2. Rhopalia — Sensors API
+
+Namespace: `gorgon.rhopalia`
+
+| Sensor            | Class                 | Description                           |
+|------------------|------------------------|---------------------------------------|
+| CPU Usage         | `RhopaliumCPU`        | Returns system-wide CPU percentage     |
+| RAM Usage         | `RhopaliumMemory`     | Returns system-wide RAM percentage     |
+| (Planned) Disk    | `RhopaliumDisk`       | Disk I/O + read/write metrics          |
+| (Planned) Network | `RhopaliumNetwork`    | Network throughput & socket usage      |
+| (Planned) SQL     | `RhopaliumSQLLatency` | Query latency & connection health      |
+
+## 2.1 `RhopaliumCPU`
+
+```python
+RhopaliumCPU.read() -> float
+```
+
+Returns current CPU usage percentage (0.0–100.0).
+
+## 2.2 `RhopaliumMemory`
+
+```python
+RhopaliumMemory.read() -> float
+```
+
+Returns RAM usage percentage.
+
+## 2.3 Sensor Base Class (future)
+
+```python
+class BaseRhopalium:
+    name: str
+    unit: str
+    def read(self): ...
+```
+
+All sensors will adopt this shared interface.
+
+---
+
+# 3. Crabs — Monitoring Agents
+
+Namespace: `gorgon.crabs`
+
+Currently implemented:
+
+| Class            | Description |
+|------------------|-------------|
+| `CrabGuardian`   | Basic synchronous polling crab |
+
+## 3.1 `CrabGuardian`
+
+```python
+CrabGuardian(
+    name: str,
+    sensors: list,
+    interval: float = 2.0,
+    buffer_size: int = 50,
+)
+```
+
+### Methods:
+
+```python
+collect_once() -> dict
+```
+Returns a dict of sensor values.
+
+```python
+run_forever()
+```
+Blocking polling loop.
+
+```python
+get_buffer() -> list
+```
+Returns internal ring-buffer of recent snapshots.
+
+### Planned Crabs
+
+- `CrabAsyncGuardian` — async version  
+- `CrabSleeper` — low-frequency ETL/archiving crab  
+- `CrabExporter` — Prometheus/OTel exporter crab  
+
+---
+
+# 4. Octopus — Central Hub API
+
+Namespace: `gorgon.core`
+
+## 4.1 `Octopus`
+
+```python
+Octopus(buffer_size: int = 500)
+```
+
+### Methods:
+
+```python
+register_crab(crab)
+```
+Registers a crab by name.
+
+```python
+collect_once(crab_name: str) -> dict
+```
+Manually trigger a collection from a specific crab.
+
+```python
+get_buffer(crab_name: str) -> list
+```
+Returns per-crab global buffer.
+
+---
+
+# 5. Gorgon Bell — Analysis & Presentation
+
+Namespace: `gorgon.bell`
+
+Current implementation:
+
+| Class             | Description |
+|-------------------|-------------|
+| `GorgonBellCLI`   | CLI-based status display |
+
+## 5.1 `GorgonBellCLI`
+
+```python
+GorgonBellCLI(
+    octopus,
+    crab_name: str,
+    cpu_warn: float = 70.0,
+    cpu_crit: float = 90.0,
+    mem_warn: float = 80.0,
+    mem_crit: float = 95.0,
+)
+```
+
+### Methods:
+
+```python
+run(iterations: int = 5)
+```
+
+Prints “OK/WARN/CRIT” status based on thresholds.
+
+### Planned Bells
+
+- `GorgonBellRichCLI` — rich-colored UI  
+- `GorgonBellNotebook` — Jupyter widget  
+- `GorgonBellWeb` — Streamlit / Dash / FastAPI  
+
+---
+
+# 6. MAI — Adaptive Intelligence (Future)
+
+Namespace: `gorgon.mai`
+
+Planned components:
+
+| Module | Description |
+|--------|-------------|
+| Memory | Short-term temporal window → history vector |
+| Attention | Dynamic weighting of sensors |
+| Inference | ML-based anomaly & correlation detection |
+
+Planned entry point:
+
+```python
+MAIEngine.attach_octopus(octopus)
+MAIEngine.predict()
+MAIEngine.explain()
+```
+
+The MAI Engine is optional.  
+The goal: **presence-like monitoring**, not consciousness simulation.
+
+---
+
+# 7. Versioning & Stability
+
+Gorgon System follows a staged API maturity model:
+
+| Status        | Meaning |
+|---------------|---------|
+| **experimental** | API may change significantly |
+| **beta** | stable, but evolving |
+| **stable** | production ready |
+
+Current status (MVP): **experimental**
+
+---
+
+# 8. Autogeneration Plans
+
+Future docs will include autogenerated detailed API references via:
+
+- **pdoc3**
+- or **Sphinx** + `autodoc`
+
+These tools will pull docstrings directly from modules and create:
+
+```
+docs/api_reference/rhopalia/
+docs/api_reference/crabs/
+docs/api_reference/core/
+docs/api_reference/bell/
+docs/api_reference/mai/
+```
+
+---
+
+# 9. Contributing
+
+If you add or modify a public method:
+
+1. Update the docstring  
+2. Update the API reference in this directory  
+3. Ensure the method is tested  
+4. Include usage examples when relevant  
+
+Thank you for helping grow Gorgon System.

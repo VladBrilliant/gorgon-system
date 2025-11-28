@@ -1,24 +1,17 @@
 <p align="center">
-  <img src="docs/pictures/gorgon_logo_main.png" alt="Gorgon System Logo" width="450">
+  <img src="docs/pictures/gorgon_logo_main.png" alt="Gorgon System Logo" width="420">
 </p>
 
 <h1 align="center">Gorgon System</h1>
 
 <p align="center">
-  <em>Biology-inspired modular monitoring framework for ML, Data and DevOps workloads.</em>
+  <em>Bio-inspired modular monitoring framework for ML, Data and DevOps workloads.</em>
 </p>
 
-
 <p align="center">
-  <a href="https://www.python.org/">
-    <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python 3.10+">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/status-experimental-orange.svg" alt="Status: experimental">
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/license-Apache%202.0-green.svg" alt="License: Apache 2.0">
-  </a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%2B-blue.svg"></a>
+  <a><img src="https://img.shields.io/badge/status-experimental-orange.svg"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green.svg"></a>
 </p>
 
 ---
@@ -26,15 +19,15 @@
 ## 💡 What is Gorgon System?
 
 **Gorgon System** is an experimental Python library for **modular monitoring and observability**,  
-inspired by **jellyfish rhopalia** (sensors) and **octopus** coordination.
+inspired by jellyfish sensory organs (*rhopalia*) and octopus neural coordination.
 
-It aims to be:
+It is designed to be:
 
-- 🪶 **Lightweight** — simple to embed into scripts, notebooks and pipelines  
-- 🧩 **Modular** — sensors, crabs, hub and “bell” are all pluggable  
-- 🧠 **Future-proof** — a foundation for more advanced MAI (Memory–Attention–Inference) ideas  
+- 🪶 **Lightweight** — easy to embed into scripts, notebooks and pipelines  
+- 🧩 **Modular** — sensors, crabs, hub and bell are all pluggable  
+- 🧠 **Future-proof** — foundation for MAI (Memory–Attention–Inference)
 
-Right now the project is in an early MVP stage, but already has a **full working vertical slice**:
+The project already implements a **full working vertical slice**:
 
 > **Rhopalia → Crabs → Octopus → Gorgon Bell (CLI)**
 
@@ -42,251 +35,213 @@ Right now the project is in an early MVP stage, but already has a **full working
 
 ## 🧬 Core Architecture
 
-Gorgon System is built around four conceptual layers:
+### Gorgon System layers
 
-```text
+```
 +---------------------+        +-----------------+        +------------------+        +------------------+
 |      Rhopalia       |  --->  |      Crabs      |  --->  |     Octopus      |  --->  |   Gorgon Bell    |
 |  (atomic sensors)   |        | (monitor units) |        |  (central hub)   |        | (analysis / UI)  |
 +---------------------+        +-----------------+        +------------------+        +------------------+
       CPU / RAM           CrabGuardian(local)              hub + buffer          CLI status (OK/WARN/CRIT)
-1. Rhopalia — Sensors
-Small, atomic units that collect raw metrics.
+```
 
-Current implementations:
+---
 
-RhopaliumCPU — system-wide CPU usage (%)
+### 1. Rhopalia — Sensors
 
-RhopaliumMemory — system-wide RAM usage (%)
+Small, atomic metric collectors.
 
-They are intentionally tiny:
+Current sensors:
 
-no global state,
+- `RhopaliumCPU` — system CPU load (%)
+- `RhopaliumMemory` — RAM usage (%)
 
-single read() method,
+Characteristics:
 
-no dependencies on higher layers.
+- no global state  
+- single `read()` method  
+- intentionally tiny  
 
-2. Crabs — Monitoring Units
-A Crab owns one or more Rhopalia and knows how and how often to poll them.
+---
 
-Current crab:
+### 2. Crabs — Monitoring Units
 
-CrabGuardian
+A Crab owns multiple rhopalia and controls how they are polled.
 
-collect_once() → polls all attached sensors and returns a snapshot
+MVP Crab: **CrabGuardian**
 
-keeps a lightweight in-memory buffer
+- `collect_once()`  
+- lightweight ring buffer  
+- simple blocking loop  
 
-simple blocking loop: run_forever()
+---
 
-3. Octopus — Central Hub
-The Octopus is the central coordinator and message bus.
+### 3. Octopus — Central Hub
 
-Responsibilities:
+The Octopus is the coordination core:
 
-register crabs (register_crab(crab))
+- registers crabs (`register_crab`)  
+- polls crabs  
+- stores unified buffer (`get_buffer`)  
 
-poll all registered crabs (collect_once())
+Design goals:
 
-keep a unified in-memory buffer (get_buffer())
+- no external database  
+- easy to extend (SQLite, DuckDB)  
+- single integration point for UI and MAI  
 
-MVP design goals:
+---
 
-No external DB required
+### 4. Gorgon Bell — Analysis & Presentation
 
-Easy to swap storage layer later
+Current implementation: **GorgonBellCLI**
 
-Single “hub” object to integrate with higher-level tools (CLI, web UI, MAI, etc.)
+- pulls metrics from the Octopus  
+- evaluates CPU/RAM  
+- prints human-readable status:
+  - OK  
+  - WARN  
+  - CRIT  
 
-4. Gorgon Bell — Analysis & Presentation
-The “bell” that rings when something goes wrong.
+Future versions:
 
-Current implementation:
+- “rich” colored terminal mode  
+- Jupyter notebook widgets  
+- web dashboards (Streamlit / FastAPI UI)  
 
-GorgonBellCLI
+---
 
-pulls data from Octopus for a given crab
+## 🚀 MVP Vertical Slice (Fully Implemented)
 
-computes simple status levels for CPU/RAM:
-
-OK, WARN, CRIT
-
-prints clean, human-readable lines to the console
-
-This is the first UI layer; in the future it can be extended to:
-
-rich colored CLI (with rich)
-
-notebook widgets
-
-web dashboards (Streamlit / Dash / FastAPI UI)
-
-🚀 MVP Vertical Slice (implemented)
-The current MVP is a full vertical path from raw metrics to human-readable status:
-
-text
-Copy code
+```
 Rhopalia (CPU, Memory)
         ↓
-CrabGuardian (polls sensors, stores buffer)
+CrabGuardian (polls sensors)
         ↓
-Octopus (hub, global buffer)
+Octopus Hub (global buffer)
         ↓
-GorgonBellCLI (OK / WARN / CRIT status lines)
-All of this is already implemented and covered by working demos.
+GorgonBellCLI (status output)
+```
 
-📦 Installation
-1. Create and activate a virtual environment (recommended)
-bash
-Copy code
+---
+
+## 📦 Installation
+
+### 1. Create a virtual environment
+
+```bash
 python -m venv .venv
-.venv\Scripts\activate   # on Windows
-# source .venv/bin/activate   # on Linux/macOS
-2. Install in editable mode
-From the project root:
+.venv\Scripts\activate       # Windows
+# source .venv/bin/activate  # Linux/macOS
+```
 
-bash
-Copy code
+### 2. Install in editable mode
+
+```bash
 pip install -e .
+```
+
 Requirements:
 
-Python 3.10+
+- Python 3.10+
+- psutil
 
-psutil
+---
 
-🧪 Examples
-Three minimal demos are included in gorgon/examples/:
+## 🧪 Examples
 
-1. Direct CrabGuardian demo
-Poll CPU & Memory directly via CrabGuardian:
+Located under `gorgon/examples/`.
 
-bash
-Copy code
+### Direct CrabGuardian
+
+```bash
 python -m gorgon.examples.demo_cpu_mem
-2. Octopus hub demo
-Register a CrabGuardian inside Octopus and poll via the hub:
+```
 
-bash
-Copy code
+### Octopus Hub
+
+```bash
 python -m gorgon.examples.demo_octopus_cpu_mem
-3. GorgonBellCLI demo (full vertical)
-Use GorgonBellCLI on top of Octopus:
+```
 
-bash
-Copy code
+### Full vertical demo (CLI)
+
+```bash
 python -m gorgon.examples.demo_bell_cli
-🧱 Code Example
-A minimal vertical integration in plain Python:
+```
 
-python
-Copy code
+---
+
+## 🧱 Minimal Code Example
+
+```python
 from gorgon.rhopalia.cpu import RhopaliumCPU
 from gorgon.rhopalia.memory import RhopaliumMemory
 from gorgon.crabs.guardian import CrabGuardian
 from gorgon.core.octopus import Octopus
 from gorgon.bell.cli import GorgonBellCLI
 
-# 1) Build sensors
 sensors = [RhopaliumCPU(), RhopaliumMemory()]
+crab = CrabGuardian("local_system", sensors, interval=2.0, buffer_size=10)
 
-# 2) Create a crab with these sensors
-crab = CrabGuardian(
-    name="local_system",
-    sensors=sensors,
-    interval=2.0,
-    buffer_size=10,
-)
-
-# 3) Create an Octopus hub and register the crab
 octo = Octopus(buffer_size=100)
 octo.register_crab(crab)
 
-# 4) Attach a CLI bell to this crab
-bell = GorgonBellCLI(
-    octopus=octo,
-    crab_name="local_system",
-    cpu_warn=70.0,
-    cpu_crit=90.0,
-    mem_warn=80.0,
-    mem_crit=95.0,
-)
-
-# 5) Run a short monitoring session
+bell = GorgonBellCLI(octopus=octo, crab_name="local_system")
 bell.run(iterations=5)
-🗂 Project Structure (MVP snapshot)
-text
-Copy code
+```
+
+---
+
+## 🗂 Project Structure
+
+```
 gorgon-system/
 ├── gorgon/
 │   ├── core/
-│   │   ├── __init__.py
-│   │   └── octopus.py          # Octopus hub
 │   ├── crabs/
-│   │   ├── __init__.py
-│   │   └── guardian.py         # CrabGuardian
 │   ├── rhopalia/
-│   │   ├── __init__.py
-│   │   ├── cpu.py              # RhopaliumCPU
-│   │   └── memory.py           # RhopaliumMemory
 │   ├── bell/
-│   │   ├── __init__.py
-│   │   └── cli.py              # GorgonBellCLI
 │   └── examples/
-│       ├── __init__.py
-│       ├── demo_cpu_mem.py
-│       ├── demo_octopus_cpu_mem.py
-│       └── demo_bell_cli.py
 ├── tests/
 ├── docs/
-│   └── gorgon-banner.png       # (to be added)
-├── pyproject.toml
 ├── LICENSE
+├── pyproject.toml
 └── README.md
-📍 Roadmap
-✅ Already implemented
-CPU sensor (RhopaliumCPU)
+```
 
-Memory sensor (RhopaliumMemory)
+---
 
-CrabGuardian (sync MVP)
+## 🧭 Roadmap
 
-Octopus core hub
+### ✔ Implemented
+- CPU / RAM rhopalia  
+- CrabGuardian (sync MVP)  
+- Octopus Hub  
+- GorgonBellCLI  
+- Working demos  
+- Editable installation  
 
-GorgonBellCLI with simple status levels
+### 🧩 Planned
+- AsyncCrabGuardian  
+- Disk / Network / GPU rhopalia  
+- Stethoscope mode (short-buffer instant graph)  
+- Jupyter notebook bell  
+- MAI Engine 0.1  
+- Storage backends (SQLite / DuckDB / Redis)  
+- Web UI  
+- PyPI packaging  
 
-Editable installation and demos
+---
 
-🧭 Planned
-Async version of CrabGuardian
+## 📄 License
 
-Additional rhopalia:
+Apache License 2.0 — see `LICENSE`.
 
-disk usage
+---
 
-network IO
+## 👤 Author
 
-GPU metrics
-
-MAI (Memory–Attention–Inference) module (initial interface)
-
-Web-based Bell (Streamlit / Dash)
-
-Notebook-integrated Bell (Jupyter)
-
-Storage backends (SQLite, DuckDB, Redis)
-
-Packaging for PyPI
-
-📄 License
-Gorgon System is licensed under the Apache License 2.0.
-See the LICENSE file for details.
-
-🙌 About
-This repository is both:
-
-a personal research playground for monitoring, MLOps and AI-assisted self-monitoring, and
-
-a real-world style project suitable for portfolios, interviews and apprenticeship applications.
-
-Contributions, ideas and experiments are welcome.
+© **2025 Vladimir Brilliantov**  
+Creator of the GORGON System architecture  
+(Rhopalia Sensors, Crabs Monitoring Agents, Octopus Hub, Gorgon Bell, MAI Engine).

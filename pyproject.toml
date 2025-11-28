@@ -1,9 +1,78 @@
-[project] 
-name = "gorgon-system" 
-version = "0.0.1" 
-description = "Experimental modular monitoring library (Gorgon System)" 
-requires-python = ">=3.10" 
- 
-[build-system] 
-requires = ["setuptools", "wheel"] 
-build-backend = "setuptools.build_meta" 
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gorgon-system"
+version = "0.0.1"
+description = "GORGON System — bio-inspired modular monitoring framework for ML, Data and DevOps workloads."
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "Vladimir Brilliantov" }
+]
+
+license = { file = "LICENSE" }
+
+keywords = [
+    "monitoring",
+    "observability",
+    "rhopalia",
+    "crabs",
+    "octopus",
+    "gorgon",
+    "bio-inspired",
+    "mlops",
+    "data-engineering",
+    "adaptive-intelligence"
+]
+
+dependencies = [
+    "psutil>=5.9",
+]
+
+# -------------------------
+# OPTIONAL DEPENDENCIES
+# -------------------------
+[project.optional-dependencies]
+
+visual = [
+    "matplotlib>=3.5",
+    "pandas>=1.5"
+]
+
+cli = [
+    "rich>=13.0"
+]
+
+async = [
+    "anyio>=3.6"
+]
+
+all = [
+    "matplotlib>=3.5",
+    "pandas>=1.5",
+    "rich>=13.0",
+    "anyio>=3.6"
+]
+
+# -------------------------
+# PACKAGE CONFIG
+# -------------------------
+
+[project.urls]
+Homepage = "https://github.com/VladBrilliant/gorgon-system"
+Documentation = "https://github.com/VladBrilliant/gorgon-system/tree/main/docs"
+Source = "https://github.com/VladBrilliant/gorgon-system"
+Issues = "https://github.com/VladBrilliant/gorgon-system/issues"
+
+[tool.setuptools]
+package-dir = { "" = "." }
+
+[tool.setuptools.packages.find]
+include = ["gorgon*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+gorgon = ["**/*.txt", "**/*.md"]
