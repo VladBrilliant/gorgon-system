@@ -240,6 +240,31 @@ Apache License 2.0 — see `LICENSE`.
 
 ---
 
+## ⚖️ Legal Notice
+
+Gorgon System is released under the **Apache License 2.0**.  
+All original architectural concepts, names, and terminology:
+
+- Rhopalia Sensors  
+- Crabs Monitoring Agents  
+- Octopus Hub  
+- Gorgon Bell  
+- Subumbrella / Exumbrella  
+- MAI Engine (Memory–Attention–Inference)
+
+were created by **Vladimir Brilliantov** (2025) and remain part of his
+intellectual authorship.
+
+This project is intended as an experimental developer-first framework and  
+**does not compete** with Prometheus, OpenTelemetry, Datadog, New Relic,
+or any enterprise-grade observability platform.
+
+Instead, it acts as an **integration-oriented sensory and analytical layer**,  
+compatible with industry standards and external monitoring systems.
+
+For full legal explanation, see `LICENSE.md` and `NOTICE.md`.
+
+
 ## 👤 Author
 
 © **2025 Vladimir Brilliantov**  
