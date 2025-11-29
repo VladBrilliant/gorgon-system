@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/pictures/gorgon_logo_main.png" alt="Gorgon System Logo" width="420">
+  <img src="docs/pictures/gorgon_logo_main_v2.png" alt="Gorgon System Logo" width="420">
 </p>
 
 <h1 align="center">Gorgon System</h1>
